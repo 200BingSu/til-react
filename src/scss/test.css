@@ -1,0 +1,29 @@
+.wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1680px;
+}
+.wrap .notice {
+  width: 1024px;
+}
+.wrap .notice ul li {
+  border: 5px solid red;
+  background-color: blue;
+}
+.wrap .notice ul li:hover {
+  background-color: pink;
+}
+.wrap .slide {
+  width: 760px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.wrap .banner {
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}/*# sourceMappingURL=test.css.map */

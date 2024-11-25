@@ -1,0 +1,14 @@
+main {
+  background-color: yellowgreen;
+}
+.layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: pink;
+  margin: 0 auto;
+  max-width: 1080px;
+}
+a {
+  color: red;
+}

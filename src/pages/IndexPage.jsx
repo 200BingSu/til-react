@@ -1,6 +1,6 @@
 import Footer from "../components/Footer";
 import Header from "../components/header";
-
+import "./IndexPage.css";
 /**
  * js로 html을 생성하는 역할
  * page라는 이름이 붙어있다.
@@ -20,9 +20,11 @@ function IndexPage() {
     <>
       <Header></Header>
       <main>
-        <div>공지사항/갤러리</div>
-        <div>배너</div>
-        <div>바로가기</div>
+        <div className="layout">
+          <div>공지사항/갤러리</div>
+          <div>배너</div>
+          <div>바로가기</div>
+        </div>
       </main>
       <Footer></Footer>
     </>
