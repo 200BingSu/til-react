@@ -1,193 +1,158 @@
-# React 프로젝트 생성(Vite)
+# React 컴퍼넌트 만들기
 
-## 1. 프로젝트 생성 과정
+## 1. 컴포넌트란?
 
-### 1.1. Github 프로젝트 생성(소문자)
+- 웹 페이지의 <b>각 요소 중</b> 재활용 되는 내요을 별도의 jsx로 생성한 것.
+- 예) Header.jsx, Footer.jsx 등
 
-### 1.2. PC에 프로젝트 생성(소문자) 및 VSCode 배치
+## 2. `component`와 `page`를 구분해 본다.
 
-### 1.3. `Vite` 프로젝트 생성
+- 수업 중 `page`라 이야기하면,
+  '`component`를 모아서 하나의 페이지를 구성한다'는 의미이다.
+- 추후에 `pages` 폴더를 생성해야 함.(`폴더는 무조건 소문자`)
+- 추후에 `componets` 폴더를 생성해야 함.
 
-- `npm create vite@latest .`
-- `npm create vite@latest 소문자프로젝트명`
-- `npm install`
+## 3. 컴포넌트의 이해
 
-### 1.4. `git` 작업
+### 3.1. html을 React에서는 `jsx`라고 한다.
 
-- `git init`
-- `git remote add origin 레포지토리 주소`
-
-### 1.5. `ReadMe.md` 수정
-
-- 실제 프로젝트 관련 내용(AI로 기본형 작성 권장)
-
-### 1.6. `.env` 환경 설정 파일 생성
-
-- `/`에 `.env` 파일 생성
-- `.gitignore`에 `.env` 추가
-
-```
-# .env
-.env
-```
-
-### 1.7. index.html 수정
-
--Lang과 title 수정
-
-```html
-<!doctype html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>React 학습</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
-```
-
-### 1.8. 기본 css 수정
-
-- `/src/App.css` 내용 전체 삭제
-- `/src/index.css`
-
-```css
-:root {
-  --primary-color: #000000;
-  --secondary-color: #0000ff;
-  --font-size-base: 16px;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-a {
-  text-decoration: none;
-  color: #000000;
-}
-ul,
-li {
-  list-style: none;
-}
-html {
-  font-size: 16px;
-}
-body {
-  font-size: var(--font-size-base);
-  color: var(--primary-color);
-}
-/* 웹서비스 개발시 권장함.(개인적으로) */
-html,
-body,
-:root {
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-}
-```
-
-### 1.9. `prettier` 설치 및 셋팅
-
-```
-npm install --save-dev prettier eslint-config-prettier eslint-plugin-prettier
-```
-
-- `/`에 `.prettierrc` 생성
-
-```json
-{
-  "singleQuote": false,
-  "semi": true,
-  "useTabs": false,
-  "tabWidth": 2,
-  "trailingComma": "all",
-  "printWidth": 80,
-  "arrowParens": "avoid",
-  "endOfLine": "auto"
-}
-```
-
-### 1.10. `ESLint`와 `prettier` 통합
-
-- `ESlint.config.js` 수정
-
-```js
-import js from "@eslint/js";
-import globals from "globals";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
-import prettier from "eslint-plugin-prettier";
-
-export default [
-  // dist 폴더는 검사 제외
-  { ignores: ["dist"] },
-  {
-    // 검사할 파일 확장자
-    files: ["**/*.{js,jsx}"],
-    // 언어 옵션
-    languageOptions: {
-      ecmaVersion: "latest", // 최신 ECMAScript 문법 사용
-      globals: globals.browser, // 브라우저 환경 글로벌 변수 사용
-      parserOptions: {
-        ecmaFeatures: { jsx: true }, // JSX 문법 활성화
-        sourceType: "module", // ES 모듈 사용
-      },
-    },
-    // React 버전 설정
-    settings: { react: { version: "18.3" } },
-    // 플러그인 설정
-    plugins: {
-      react, // React 관련 규칙 플러그인
-      "react-hooks": reactHooks, // React Hooks 규칙 플러그인
-      "react-refresh": reactRefresh, // React Refresh 규칙 플러그인
-      prettier, // Prettier 플러그인
-    },
-    // 규칙 정의
-    rules: {
-      ...js.configs.recommended.rules, // 기본 JavaScript 권장 규칙
-      ...react.configs.recommended.rules, // React 권장 규칙
-      ...react.configs["jsx-runtime"].rules, // JSX Runtime 규칙
-      ...reactHooks.configs.recommended.rules, // React Hooks 권장 규칙
-      "react/jsx-no-target-blank": "off", // target="_blank" 관련 규칙 비활성화
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ], // React Fast Refresh 규칙
-      "prettier/prettier": "warn", // Prettier 규칙 (포매팅 오류를 에러로 표시)
-    },
-  },
-];
-```
-
-### 1.11. `eslint` 테스트
-
-- `App.js` 테스트
+- js로 html을 생성하는 역할
+- page라는 이름이 붙어있다.
+- 함수명이 대문자로 시작하는 파스칼 케이스로 써야한다.
+- jsx를 출력하는 함수는 파스칼 케이스를 써야한다는 규칙이 있다.
+- jsx를 출력하는 함수는 반드시 `return()` 구문이 있어야 한다. -` return() 안쪽`에 `html` 형식을 작성한다.
+- jsx는 `html 태그 형식`으로 호출(call) 한다.
 
 ```jsx
-function App() {
-  const a = 1; // 오류
-  return <div>App</div>;
+function IndexPage() {
+  return <div>안녕</div>;
+}
+```
+
+- jsx는 <b>반드시 root 태그</b>가 존재해야한다.
+- 용도가 묶음 외에 없는 Root라면 `<></> Fragment`로 묶는다.
+
+````jsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+
+/**
+ * js로 html을 생성하는 역할
+ * page라는 이름이 붙어있다.
+ * 함수명이 대문자로 시작하는 파스칼 케이스로 써야한다.
+ * jsx를 출력하는 함수는 파스칼 케이스를 써야한다는 규칙이 있다.
+ * jsx를 출력하는 함수는 반드시 return() 구문이 있어야 한다.
+ * return() 안쪽에 html 형식을 작성한다.
+ * jsx는 html 태그 형식으로 호출(call) 한다.
+ * ```jsx
+ * function IndexPage() {return <div>안녕</div>;}
+ * ```
+ * jsx는 반드시 root 태그가 존재해야한다.
+ * 용도가 묶음 외에 없는 Root라면 <></> Fragment로 묶는다.
+ */
+function IndexPage() {
+  return (
+    <>
+      <header>상단</header>
+      <main>메인</main>
+      <footer>하단</footer>
+    </>
+  );
 }
 
-export default App;
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <IndexPage></IndexPage>
+  </StrictMode>,
+);
+````
+
+### 3.2. 각 화면의 기능에 따라 파일을 분리한다.
+
+- `/src/pages/` 폴더에는 URL의 주소에 맞는 페이지 배치
+- `/src/components/` 폴더에는 각각의 페이지에 배치될 html 요소를 배치
+
+- /src/components/Header.jsx
+
+```jsx
+const Header = () => {
+  return (
+    <header>
+      <a href="#">로고</a>
+      <div>
+        <ul>
+          <li>
+            <a href="">주메뉴1</a>
+          </li>
+          <li>
+            <a href="">주메뉴2</a>
+          </li>
+          <li>
+            <a href="">주메뉴3</a>
+          </li>
+          <li>
+            <a href="">주메뉴4</a>
+          </li>
+        </ul>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
 ```
 
-### 1.12. 실행 테스트
+- /src/components/Footer.jsx
 
+```jsx
+const Footer = () => {
+  return (
+    <footer>
+      <a href="#">로고</a>
+      <div>카피라이터</div>
+      <div>SNS</div>
+    </footer>
+  );
+};
+
+export default Footer;
 ```
-npm run dev
+
+- /src/pages/IndexPage.jsx
+
+```jsx
+function IndexPage() {
+  return (
+    <>
+      <Header></Header>
+      <main>
+        <div>공지사항/갤러리</div>
+        <div>배너</div>
+        <div>바로가기</div>
+      </main>
+      <Footer></Footer>
+    </>
+  );
+}
+
+export default IndexPage;
 ```
 
-## 2. git 작업
+- /src/pages/CeoPage.jsx
 
-- `git add .`
-- `git commit`
-- `git push origin main`
+```jsx
+import Footer from "../components/Footer";
+import Header from "../components/header";
+
+function CeoPage() {
+  return (
+    <>
+      <Header></Header>
+      <main>대표인사말</main>
+      <Footer></Footer>
+    </>
+  );
+}
+export default CeoPage;
+```
