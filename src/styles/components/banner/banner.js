@@ -1,0 +1,10 @@
+const BannerStyleObj = {
+  display: "flex",
+  backgroundColor: "blue",
+  width: "calc(100% /3)",
+  height: "200px",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export default BannerStyleObj;
