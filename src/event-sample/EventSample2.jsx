@@ -6,6 +6,10 @@ const EventSample2 = () => {
   const [text, setText] = useState("");
   const [time, setTime] = useState(0);
 
+  const timer = () => {
+    clearInterval(setTime(0));
+  };
+
   return (
     <div>
       <div>
@@ -22,11 +26,10 @@ const EventSample2 = () => {
             console.log(event.target.value);
             setText(event.target.value);
           }}
-          onKeyDown={event => {}}
         ></textarea>
       </div>
       <div>피드백: {text === "" || originText === text ? "😊" : "😒"}</div>
-      <div>입력</div>
+      <div>입력 시간: {time}</div>
     </div>
   );
 };
