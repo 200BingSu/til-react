@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import { useState } from "react";
 
 const Sample3 = () => {
@@ -14,6 +15,18 @@ const Sample3 = () => {
   const PopRemoveCSS = {
     display: "none",
   };
+  // const ModalWinDiv = styled.div`
+  //   position: fixed;
+  //   left: 0;
+  //   top: 0;
+  //   width: 100%;
+  //   height: 100vh;
+  //   background-color: rgba(0, 0, 0, 0.8);
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+  //   z-index: 99;
+  // `;
 
   return (
     <div>
