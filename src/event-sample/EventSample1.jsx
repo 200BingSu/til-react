@@ -16,30 +16,60 @@ const EventSample1 = () => {
     hobby: ["골프"],
   };
   const [formData, setFormData] = useState(initData);
+
   const [idCheck, setIdCheck] = useState(false);
 
   const handleChange = event => {
+    const { name, value, type, checked } = event.target;
+    if (type === "checkbox") {
+      setFormData({
+        ...formData,
+        [name]: checked
+          ? [...formData.hobby, value]
+          : formData.hobby.filter(item => {
+              return item !== value;
+            }),
+      });
+      return;
+    }
+
+    if (name === "pic") {
+      setFormData({ ...formData, [name]: files[0] });
+      return;
+    }
+    if (name === "doc") {
+      setFormData({ ...formData, [name]: [...files] });
+      return;
+    }
+
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value,
+      [name]: value,
     });
   };
-  const handleClick = () => {};
-  const handleIdCheck = () => {};
+  // const handleClick = event => {};
+  const handleIdCheck = () => {
+    alert(`${formData.userid} 를 들고 백엔드 갔다왔더니 중복 아니랍니다.`);
+    setIdCheck(true);
+  };
+
   const handleSubmit = event => {
-    {
-      event => {
-        // 기본 동작 즉, 웹브라우저로 action 하려는 것 막고 유효성 검사
-        event.preventDefault();
-      };
+    // 기본 동작 즉, 웹브라우저로 action 하려는 것 막고 유효성 검사
+    event.preventDefault();
+  };
+  const handleKeyDown = event => {
+    if (event.key === "Enter") {
+      if (formData.userpass !== formData.userpassconfirm) {
+        alert("비밀번호가 서로 다릅니다.");
+        setFormData({ ...formData, [event.target.name]: "" });
+      }
     }
   };
-  const handleKeyDown = event => {};
 
   return (
     <div>
       <h1>회원가입</h1>
-      <form onSubmit={() => handleSubmit()}>
+      <form onSubmit={event => handleSubmit(event)}>
         {/* 숨긴 쿼리스트링 */}
         <input type="hidden" name="now" value={formData.now} />
         {/* 회원가입 기본정보 입력영역 */}
@@ -58,16 +88,7 @@ const EventSample1 = () => {
               minLength={4}
               onChange={event => handleChange(event)}
             />
-            <button
-              type="button"
-              onClick={() => {
-                alert(
-                  `${formData.userid} 를 들고 백엔드 갔다왔더니 중복 아니랍니다.`,
-                );
-
-                setIdCheck(true);
-              }}
-            >
+            <button type="button" onClick={() => handleIdCheck()}>
               아이디 중복검사
             </button>
           </div>
@@ -79,12 +100,7 @@ const EventSample1 = () => {
               value={formData.useremail}
               id="userEmail"
               placeholder="이메일을 입력하세요."
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
           </div>
           <div>
@@ -97,12 +113,7 @@ const EventSample1 = () => {
               placeholder="비밀번호를 입력하세요."
               maxLength={16}
               minLength={8}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
           </div>
           <div>
@@ -115,20 +126,8 @@ const EventSample1 = () => {
               placeholder="비밀번호 확인을 입력하세요."
               maxLength={16}
               minLength={8}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
-              onKeyDown={event => {
-                if (event.key === "Enter") {
-                  if (formData.userpass !== formData.userpassconfirm) {
-                    alert("비밀번호가 서로 다릅니다.");
-                    setFormData({ ...formData, [event.target.name]: "" });
-                  }
-                }
-              }}
+              onChange={event => handleChange(event)}
+              onKeyDown={event => handleKeyDown(event)}
             />
           </div>
         </fieldset>
@@ -142,12 +141,7 @@ const EventSample1 = () => {
               name="age"
               id="age"
               value={formData.age}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
           </div>
           <div>
@@ -159,12 +153,7 @@ const EventSample1 = () => {
               value="male"
               // defaultChecked
               checked={formData.gender === "male"}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
             <label htmlFor="male">남성</label>
             <input
@@ -173,12 +162,7 @@ const EventSample1 = () => {
               id="femail"
               value="femail"
               checked={formData.gender === "femail"}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
             <label htmlFor="femail">여성</label>
             <input
@@ -187,12 +171,7 @@ const EventSample1 = () => {
               id="etc"
               value="etc"
               checked={formData.gender === "etc"}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
             <label htmlFor="etc">기타</label>
           </div>
@@ -204,12 +183,7 @@ const EventSample1 = () => {
               id="area"
               value={formData.area}
               //defaultValue={formData.area}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: [event.target.value],
-                });
-              }}
+              onChange={event => handleChange(event)}
             >
               <option value="">전체</option>
               <option value="daegu">대구</option>
@@ -227,12 +201,7 @@ const EventSample1 = () => {
               value={formData.birthday}
               id="birthday"
               //defaultValue={formData.birthday}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
           </div>
 
@@ -245,12 +214,7 @@ const EventSample1 = () => {
               rows={4}
               cols={50}
               style={{ resize: "vertical" }}
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             ></textarea>
           </div>
           <div>
@@ -261,12 +225,7 @@ const EventSample1 = () => {
               id="pic"
               value={formData.pic}
               accept="image/png, image/jpeg"
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: [event.target.value],
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
           </div>
           <div>
@@ -277,35 +236,37 @@ const EventSample1 = () => {
               value={formData.doc}
               id="doc"
               multiple
-              onChange={event => {
-                setFormData({
-                  ...formData,
-                  [event.target.name]: event.target.value,
-                });
-              }}
+              onChange={event => handleChange(event)}
             />
           </div>
 
           <div>
             <label>취미</label>
-            <input
-              type="checkbox"
-              value="골프"
-              name="hobby"
-              id="ho1"
-              defaultChecked
-            />
-            <label htmlFor="ho1">골프</label>
-            <input type="checkbox" value="운동" name="hobby" id="ho2" />
-            <label htmlFor="ho2">운동</label>
-            <input type="checkbox" value="공부" name="hobby" id="ho3" />
-            <label htmlFor="ho3">공부</label>
-            <input type="checkbox" value="요리" name="hobby" id="ho4" />
-            <label htmlFor="ho4">요리</label>
+            {["골프", "운동", "공부", "요리"].map((item, index) => {
+              return (
+                <span key={index}>
+                  <input
+                    type="checkbox"
+                    value={item}
+                    name="hobby"
+                    id={`ho${index + 1}`}
+                    // defaultChecked
+                    checked={formData.hobby.includes(item)}
+                    onChange={event => handleChange(event)}
+                  />
+                  <label htmlFor={`ho${index + 1}`}>{item}</label>
+                </span>
+              );
+            })}
           </div>
         </fieldset>
         <div>
-          <button type="reset" onClick={() => setFormData(initData)}>
+          <button
+            type="button"
+            onClick={() => {
+              setFormData(initData);
+            }}
+          >
             다시작성
           </button>
           <button type="submit">회원가입</button>
