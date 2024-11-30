@@ -6,9 +6,11 @@ const EventSample2 = () => {
   const [text, setText] = useState("");
   const [time, setTime] = useState(0);
 
-  const timer = () => {
-    clearInterval(setTime(0));
-  };
+  let timer = setInterval(() => count(), 1000);
+
+  function count() {
+    setTime(time => time + 1);
+  }
 
   return (
     <div>
