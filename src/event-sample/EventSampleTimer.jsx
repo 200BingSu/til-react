@@ -37,10 +37,10 @@ const EventSampleTimer = () => {
   const formatHours = hours > 9 ? String(hours) : `0${hours}`;
 
   const minutes = parseInt((time % hour) / minute);
-  const formatMinutes = minutes;
+  const formatMinutes = minutes > 9 ? String(minutes) : `0${minutes}`;
 
   const seconds = parseInt((time % hour) % minute);
-  const formatSeconds = seconds;
+  const formatSeconds = seconds > 9 ? String(seconds) : `0${seconds}`;
   console.log("고침");
   return (
     <div>
