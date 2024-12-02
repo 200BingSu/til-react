@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const EventSampleTimer = () => {
-  const [time, setTime] = useState(3599);
+  const [time, setTime] = useState(0);
   const [timer, setTimer] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
 
