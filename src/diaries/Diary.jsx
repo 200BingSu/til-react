@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-const DATA_URL = `http://localhost:5000/diaries`;
+import { DATA_URL } from "./constant";
 
 const Diary = () => {
   // 데이터 베이스 주소
