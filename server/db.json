@@ -21,16 +21,21 @@
       "weather": "2"
     }
   ],
-  "members": [
+  "member": [
     {
-      "id": "2",
-      "email": "222@a.net",
-      "pw": "456"
+      "id": "06c0",
+      "email": "hello@a.net",
+      "pw": "asdaff"
     },
     {
-      "id": "ae37",
+      "id": "f45c",
       "email": "hello@a.net",
-      "pw": "skdlajlwh"
+      "pw": "sadffawgg"
+    },
+    {
+      "id": "7be9",
+      "email": "asdsff@dw.net",
+      "pw": "sajdlkghg"
     }
   ]
 }
