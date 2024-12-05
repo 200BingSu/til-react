@@ -1,173 +1,51 @@
-# Router 참고 처리 사항
+# 리소스 최적화
 
-- 현재 모든 jsx 파일을 불러들이는 것은 부하가 크다.
-- 동적 로딩
+- 이미지, 폰트 등등
+- /public은 원본을 유지한다.
+- /src는 압축한다.(웹브라우저도 보관하고 있다)
 
-## 1. lazy
+## 1. 이미지
 
-: 한번에 모두 받아오는게 아니고 필요할 때마다 jsx 읽어오기
+- 용도에 맞게 판단하자.
+  - 동적인 것을 제외하면 `src`에 보관하자(그냥 src에 넣자..)
 
-```jsx
-// 기존 코드: import NotFound from "./pages/NotFound";
-const Footer = lazy(() => import("./components/Footer"));
-const Header = lazy(() => import("./components/Header"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const HomePage = lazy(() => import("./pages/Index"));
-const AboutPage = lazy(() => import("./pages/about/Index"));
-const TeamPage = lazy(() => import("./pages/about/Team"));
-const BlogDetailPage = lazy(() => import("./pages/blog/Detail"));
-const BlogPage = lazy(() => import("./pages/blog/Index"));
-const Layout = lazy(() => import("./pages/blog/Layout"));
-const BlogListPage = lazy(() => import("./pages/blog/List"));
-const ServicePage = lazy(() => import("./pages/service/Index"));
-const NowPage = lazy(() => import("./pages/service/Now"));
-```
+## 2. font 파일
 
-## 2. Suspense
+- 가능하면 웹폰트 URL을 사용하자.
+- 구글 폰트 또는 눈누에 웹폰트 URL이 없는 경우, 직접 파일 설정
+- 파일인 경우 `public 폴더`에 넣어두고 활용하자.
+- /src/assets에 두시면 설정할 것이 꽤 많음.
 
-```jsx
-import { lazy, Suspense, useState } from "react";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+### 2.1. 폰트 파일인 경우
 
-const Footer = lazy(() => import("./components/Footer"));
-const Header = lazy(() => import("./components/Header"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const HomePage = lazy(() => import("./pages/Index"));
-const AboutPage = lazy(() => import("./pages/about/Index"));
-const TeamPage = lazy(() => import("./pages/about/Team"));
-const BlogDetailPage = lazy(() => import("./pages/blog/Detail"));
-const BlogPage = lazy(() => import("./pages/blog/Index"));
-const Layout = lazy(() => import("./pages/blog/Layout"));
-const BlogListPage = lazy(() => import("./pages/blog/List"));
-const ServicePage = lazy(() => import("./pages/service/Index"));
-const NowPage = lazy(() => import("./pages/service/Now"));
+- public/ 폴더에 파일 배치
+- /src/index.css : 모든 곳에 기본적 적용
 
-// 목(Mock Data) 데이터
-const BlogDatas = [
-  { id: 1, title: "블러그 1", cate: "design", content: "디자인 관련글 1" },
-  { id: 2, title: "블러그 2", cate: "market", content: "마케팅 관련글" },
-  { id: 3, title: "블러그 3", cate: "design", content: "디자인 관련글 2" },
-  { id: 4, title: "블러그 4", cate: "idea", content: "아이디어 관련글" },
-  { id: 5, title: "블러그 5", cate: "design", content: "디자인 관련글 3" },
-];
-
-function App() {
-  const [isMember, setIsMember] = useState(true);
-
-  return (
-    <Router>
-      <Header />
-      <main>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Suspense fallback={<div>로딩중...</div>}>
-                <HomePage title={"좋은회사"} year={2024} />
-              </Suspense>
-            }
-          />
-
-          <Route path="/about">
-            <Route
-              index
-              element={
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <AboutPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="team"
-              element={
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <TeamPage />
-                </Suspense>
-              }
-            />
-          </Route>
-
-          <Route path="/service">
-            <Route
-              index
-              element={
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <ServicePage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="now"
-              element={
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <NowPage />
-                </Suspense>
-              }
-            />
-          </Route>
-
-          <Route
-            path="/blog"
-            element={
-              <Suspense fallback={<div>로딩중...</div>}>
-                <Layout />
-              </Suspense>
-            }
-          >
-            <Route
-              index
-              element={
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <BlogPage data={BlogDatas} />
-                </Suspense>
-              }
-            />
-            <Route
-              path=":id"
-              element={
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <BlogDetailPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="list"
-              element={
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <BlogListPage />
-                </Suspense>
-              }
-            />
-          </Route>
-
-          <Route
-            path="*"
-            element={
-              <Suspense fallback={<div>로딩중...</div>}>
-                <NotFound />
-              </Suspense>
-            }
-          />
-        </Routes>
-      </main>
-      <Footer>
-        <p>Copyright 2024 By Hong</p>
-        {isMember ? <p>로그인 하셨네요.</p> : <p>로그인 전입니다.</p>}
-      </Footer>
-    </Router>
-  );
+```css
+/* 글꼴 설정 */
+@font-face {
+  font-family: "chab";
+  src: url("/public/chab.ttf");
 }
-
-export default App;
+@font-face {
+  font-family: "ddag";
+  src: url("/public/ddag.ttf");
+}
+body {
+  font-family: "ddag";
+}
 ```
 
-## 3. 라이브러리 활용
+# 빌드하기
 
-- `react-spinner`
-- https://www.npmjs.com/package/react-spinners
-- https://www.davidhu.io/react-spinners/
-- `npm i react-spinners`
+- 배포 버전 생성
 
-```js
-<PacmanLoader color="#fff139" />
+```
+npm run build
+```
+
+- 배포 버전 테스트
+
+```
+npm run preview
 ```
