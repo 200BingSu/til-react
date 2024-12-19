@@ -1,7 +1,5 @@
 :root {
-  --primary-color: #000000;
-  --secondary-color: #0000ff;
-  --font-size-base: 16px;
+  font-size: 24px;
 }
 
 * {
@@ -21,10 +19,8 @@ html {
   font-size: 16px;
 }
 body {
-  font-size: var(--font-size-base);
-  color: var(--primary-color);
 }
-/* 웹서비스 개발시 권장함.(개인적으로) */
+
 html,
 body,
 :root {
