@@ -7,6 +7,7 @@ export const UserInfoContext = createContext();
 // context에 만들어둔 값을 읽거나,
 // context에 만들어둔 기능을 사용하기 위한 공급자(provider)생성
 export const UserInfoProvider = ({ children }) => {
+  // useState 로 로그인한 사용자 정보 관리
   const [userInfo, setUserInfo] = useState({
     userId: "",
     userName: "",
