@@ -25,6 +25,7 @@ const AddTodo = React.memo(({ addTodo }) => {
   );
 });
 
+// esLint 설정을 통해 전체 코드에서 display name을  <Anonymous>로 있어도 빨간줄 지우기 가능.
 // AddTodo.displayName = "AddTodo";
 
 export default AddTodo;
