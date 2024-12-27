@@ -1,18 +1,68 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
+import AddTodo from "./AddTodo";
+import TodoItem from "./TodoItem";
 
 function App() {
-  const [query, setQuery] = useState("");
-  // query 가 변경이 된다면 그때 함수를 다시 정의하겠다.
-  const handleSearch = useCallback(() => {
-    console.log("query를 처리하는 새로운 함수 생성 ", query);
-  }, [query]);
+  // id 부여를 위한 useRef(initData의 id가 3이라서)
+  const totalRef = useRef(3);
+  const initData = [
+    { id: 1, text: "리액트 공부하기", completed: false },
+    { id: 2, text: "운동가기", completed: false },
+  ];
+  const [todos, setTodos] = useState(initData);
+
+  // useCallback
+  // todo 관리 함수를 리랜더링시 재생성 하지 않도록 적용
+  const addTodo = useCallback(text => {
+    const newId = totalRef.current++;
+    setTodos(prev => [...prev, { id: newId, text: text, completed: false }]);
+  }, []);
+  const toggleTodo = useCallback(id => {
+    // const arr = todos.map(item => {
+    //   return item.id === id ? { ...item, completed: !item.completed } : item;
+    // });
+    setTodos(prev =>
+      prev.map(item => {
+        return item.id === id ? { ...item, completed: !item.completed } : item;
+      }),
+    );
+  }, []);
+  const deleteTodo = useCallback(id => {
+    const arr = todos.filter(item => item.id !== id);
+    setTodos(arr);
+  }, []);
 
   return (
     <div>
-      <h1>state 변경시 함수 재 실행</h1>
-      <input value={query} onChange={e => setQuery(e.target.value)} />
-      <button onClick={handleSearch}>검색</button>
+      <h1>Todo Service</h1>
+      <AddTodo addTodo={addTodo} />
+      <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo} />
     </div>
   );
 }
 export default App;
+
+const TodoList = React.memo(function TodoList({
+  todos,
+  toggleTodo,
+  deleteTodo,
+}) {
+  console.log("todolist 리랜더링");
+  return (
+    <div>
+      <h2>할일 목록</h2>
+      <div>
+        {todos.map(item => {
+          return (
+            <TodoItem
+              key={item.id}
+              todo={item}
+              toggleTodo={toggleTodo}
+              deleteTodo={deleteTodo}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+});

@@ -1,127 +1,63 @@
-# useCallback
+# React.memo
 
-- `React를 최적화`하였다: 리랜더링 횟수를 줄인다.
+- `컴포넌트`에 리랜더링을 조절해 주는 것.
+- 컴포넌트에 props가 바뀌지 않는 한 리랜더링 안됨.
+- 성능을 상당히 올려줌
+- 회사 프로덕트에서는 리랜더링 횟수를 줄여야 좋다.
+- 메모제이션 방안(useMemo, useCallback, React.memo) 중 가장 권장함.
 
-## 최적화
-
-### 레이아웃 최적화를 했는가?
-
-- `Shift Layout` 적용했는가
-- css로 직접 만들거나 npm을 이용하여 해결
-
-### 리랜더링 최적화를 했는가?
-
-- `useMemo()`: 변수 관리 했어요?
-- `useCallback()`: 함수 관리 했어요? = 함수를 리랜더링할 때 다시 정의하지 않고 보관해둬야한다.
-- `React.memo()`: 컴포넌트 관리 했어요?
-
-### Lazy Loading 했는가?
-
-### 이미지 최적화 했는가?
-
-- web...
-
-### SEO 최적화 했는가?
-
-### GA4 적용 했어요?
-
-(어렵다..!)
-
-## useCallback
-
-- useCallback() : 함수를 리랜더링시 다시 정의하지 않고 보관해둠
-
-### 기본예제
+## 기본 예제
 
 ```jsx
-import { useState, useCallback } from "react";
-
-function App() {
-  const [count, setCount] = useState(0);
-  // 리랜더링 즉, state 가 바뀌면 함수도 다시 만들어짐.
-  // 이를 다시 정의하지 않도록 useCallback 활용
-  const add = useCallback(() => {
-    // 함수의 기능
-    setCount(prev => prev + 1);
-  }, []);
+const TodoList = React.memo(function TodoList({
+  todos,
+  toggleTodo,
+  deleteTodo,
+}) {
+  console.log("todolist 리랜더링");
   return (
     <div>
-      <h1> 카운팅 : {count}</h1>
-      <button onClick={add}>증가</button>
+      <h2>할일 목록</h2>
+      <div>
+        {todos.map(item => {
+          return (
+            <TodoItem
+              key={item.id}
+              todo={item}
+              toggleTodo={toggleTodo}
+              deleteTodo={deleteTodo}
+            />
+          );
+        })}
+      </div>
     </div>
   );
-}
-export default App;
+});
 ```
 
-### 응용예제
+## 리액트 프로젝트 메모제이션
 
-- `컴포넌트는 props가 전달되면 리랜더링한다.`
-- `props가 변화가 없으면 리랜더링 안한다`
+- 복잡한 배열요소에 대한 처리는 useMemo를 활용하였고,
+- 함수의 재정의를 제어하기 위해 useCallback을 활용하였으며,
+- 리랜더링 횟수를 조절하기 이해 React.memo를 적용했습니다.
+
+## 추가 샘플(파일로 컴포넌트 제작시 처리)
 
 ```jsx
- /function App() {
-  // useState
-  const [count, setCount] = useState(0);
-  const [text, setText] = useState("");
-  // 숫자 증가 함수를 메모해둠.
-  // 만약 count가 변하면 리랜더링됨.
-  // 만약 text가 변하면 리랜더링됨.
-  // useCallback을 활용하지 않는다면 text와 count가 변하면 함수가 다시 만들어짐.
-  const add = useCallback(() => {
-    console.log("함수 재생성됨");
-    setCount(prev => prev + 1);
-  }, [count]);
-
+const TodoItem = React.memo(({ todo, toggleTodo, deleteTodo }) => {
+  console.log("todoitem 리랜더링", todo);
   return (
     <div>
-      <h1>부모 컴포넌트</h1>
-      <Child add={add} />
-      <div>카운팅: {count}</div>
       <input
-        type="text"
-        value={text}
-        onChange={e => {
-          setText(e.target.value);
-        }}
+        type="checkbox"
+        checked={todo.completed}
+        onChange={() => toggleTodo(todo.id)}
       />
-    </div>
-  );
-}
-export default App;
-
-function Child({ add }) {
-  console.log("자식 컴포넌트 리랜더링");
-  return (
-    <div>
-      자식 컴포넌트
-      <button type="button" onClick={add}>
-        증가
+      <span> {todo.text}</span>
+      <button type="button" onClick={() => deleteTodo(todo.id)}>
+        삭제
       </button>
     </div>
   );
-}
-```
-
-- 의존성 배열의 이해
-
-```jsx
-import { useState, useCallback } from "react";
-
-function App() {
-  const [query, setQuery] = useState("");
-  // query 가 변경이 된다면 그때 함수를 다시 정의하겠다.
-  const handleSearch = useCallback(() => {
-    console.log("query를 처리하는 새로운 함수 생성 ", query);
-  }, [query]);
-
-  return (
-    <div>
-      <h1>state 변경시 함수 재 실행</h1>
-      <input value={query} onChange={e => setQuery(e.target.value)} />
-      <button onClick={handleSearch}>검색</button>
-    </div>
-  );
-}
-export default App;
+});
 ```
