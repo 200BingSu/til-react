@@ -1,207 +1,121 @@
-# 커스텀 훅(custom hook)
+# useReducer
 
-## hook이란?
+## 목적
 
-- hook이란 `걸다` 또는 `덩달아 실행한다`는 의미.
-- 리액트 컴포넌트의 state와 lifecyled에 따라서 같이 실행되어지는 함수
-- useState, useEffect, useReft, useContext, useMemo, useCallback ... 등등 200개 정도
-- 개발자가 리액트 빌트인 hook처럼 만든 hook을 커스텀 훅이라고 합니다.
-- 예) useLocation, usenavigation, useForm
+- state를 생성
+- state를 업데이트하는 기능을 별도로 관리
+- state를 업데이트하는 과정이 복잡한 경우 적합함
+- Redux, Recoil, Zustand 등의 state 관리의 기본 구성을 이해하는데 도움.
 
-## hook을 만들 때 유의사항
+## useReducer 이해의 과정
 
-- 동일한 기능을 만약 여러번 사용한다면 함수를 만들어 볼 생각을 하자.
-- 이 함수가 컴포넌트에 사용이 된다면 hook으로 만들어볼 생각을 하자.
-- `/src/hooks`라는 폴더에 모아두겠다라고 생각해 보자.
-- 파일명을 반드시 `use훅명`으로 생성해야 리액트에서 hook 처럼 사용하게 해준다.
-- 파일명은 반드시 `use훅명.js`로 작성해야 한다.
-
-## hook을 사용시 유의사항
-
-- 리액트 훅이든, 사용자 정의 훅이든 반드시 `컴포넌트 내부`에 배치되어야 한다.
-- 리액트 훅이든, 사용자 정의 훅이든 `if문, for문 등의 내부에서는 사용할 수 없다`.
-- 예외로, 커스텀 훅은 컴포넌트가 아닌 곳에도 사용할 수 있는 리액트 훅이다.
+- 간단한 state 관리
+- `폴더 컨벤션` 생성 후 관리(2단계 정도, 중소 규모 관리, 대규모 관리)
+- context API와 useReducer 활용
 
 ## 기본 예제
 
-```js
-import { useState } from "react";
-
-function useCount() {
-  const [count, setCount] = useState(0);
-  const add = () => setCount(count + 1);
-  const minus = () => setCount(count - 1);
-  const reset = () => setCount(0);
-
-  return { count, add, minus, reset };
-}
-```
-
 ```jsx
-function App() {
-  const { count, add, minus, reset } = useCount();
+import { useReducer } from "react";
+
+// 1. 초기 상태
+const initialState = { count: 0 };
+
+// 2. 리듀서 함수(상태를 변경하는 기능)
+// state는 초기 상태값을 말함. (별도로 업데이트하지 않는다)
+// action에 여러가지 옵션을 주어 state를 업데이트한다.
+function reducer(state, action) {
+  console.log("state:", state);
+  console.log("action:", action);
+  switch (action.type) {
+    case "add":
+      // 처리하고 나서 항상 state를 리턴해준다.
+      return { count: state.count + 1 };
+    case "minus":
+      return { count: state.count - 1 };
+    case "reset":
+      return { count: 0 };
+    default:
+      return state;
+  }
+}
+
+function Counter() {
+  // 3. useReduce에 state와 디스패치 함수 등록
+  // 첫번째 매개변수: 리듀서 함수
+  // 두번째 매개변수: 초기값 state
+  // 리턴값: state는 리랜더링시 표현
+  // 리턴값: dispatch 는 리듀서 함수 실행
+  const [state, dispatch] = useReducer(reducer, initialState);
   return (
     <div>
-      <h1>카운트: {count}</h1>
-      <button type="button" onClick={add}>
-        증가
-      </button>
-      <button type="button" onClick={minus}>
-        감소
-      </button>
-      <button type="button" onClick={reset}>
-        리셋
-      </button>
+      <p>결과값:{state.count}</p>
+      <button onClick={() => dispatch({ type: "add" })}>더하기</button>
+      <button onClick={() => dispatch({ type: "minus" })}>빼기</button>
+      <button onClick={() => dispatch({ type: "reset" })}>초기화</button>
+      <button onClick={() => dispatch({ type: "gogo" })}>테스트</button>
     </div>
   );
 }
-```
 
-## 활용 예제
-
-- 동일한 기능의 반복 사용이라면 custom hook을 고민해야함.
-- custom hook을 생성시 많은 고민을 해야 합니다.
-- /hooks/useAxios.js
-
-```js
-// 일반적으로 FE 개발자는 백엔드와 API 통신을 할거다.
-// 일반적으로 FE 개발자는 주소와 자료를 전달하고 결과를 받을 것이다.
-// 일반적으로 FE 개발자는 get, post, put, delete 를 사용할 것이다.
-// 내가 API 통신을 편리하게 사용할 수 있는 Hook 을 만들어서
-// 팀의 API 통신 컨벤션을 제공하겠다.
-
-import axios from "axios";
-import { useState, useEffect } from "react";
-
-// 일반적 사용을 조사
-// const { data, error, loading } = useAxios("주소", "자료", "get");
-// const { data, error, loading } = useAxios("주소", "자료", "GET");
-// const { data, error, loading } = useAxios("주소", { 자료 }, "post");
-// const { data, error, loading } = useAxios("주소", null, "put");
-// const { data, error, loading } = useAxios("주소", 1, "delete");
-export function useAxios(_url, _payload = null, _method) {
-  // api 회신 결과
-  const [data, setData] = useState(null);
-  // api 회산 오류 결과
-  const [error, setError] = useState(null);
-  // api 호출 진행 중
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    // 로딩 진행중
-    setLoading(true);
-    // API 연동 실행
-    const fetchAPI = async () => {
-      try {
-        let response;
-        let method = _method.toUppercase(_method);
-        switch (method) {
-          case "GET":
-            response = await axios.get(_url);
-            break;
-          case "POST":
-            response = await axios.post(_url, _payload);
-            break;
-          case "PUT":
-            response = await axios.put(_url, _payload);
-            break;
-          case "DELETE":
-            response = await axios.delete(_url);
-            break;
-          default:
-            throw new Error(`${_method} 잘못 보내셨네요.`);
-        }
-        setData(response.data);
-      } catch (error) {
-        console.log(error);
-        setError(error);
-      }
-    };
-    // 만들어둔 fetch 실행
-    fetch();
-    // 데이터 로딩 완료
-    setLoading(false);
-  }, [_url, _payload, _method]);
-
-  return { data, error, loading };
-}
-```
-
-- /hooks/useLogin
-
-```js
-export const useLogin = () => {
-  // 로그인 상태
-  const [isLogin, setIsLogin] = useState(false);
-  //   사용자 정보
-  const [data, setData] = useState(null);
-  // 서버 에러
-  const [error, setError] = useState(null);
-  //   서버 연결중
-  const [loading, setLoading] = useState(false);
-  //   로그인 함수
-  const login = async (id, pw) => {
-    try {
-      const res = await axios.post("/api/login", { id: id, pw: pw });
-      setData(res.data);
-      setIsLogin(true);
-    } catch (error) {
-      console.log(error);
-      setError(error);
-    }
-    setLoading(false);
-  };
-  return { data, loading, error, isLogin, login };
-};
-```
-
-- /hooks/useComponent.js
-
-```js
-// 화면의 리사이즈를 체크하는 용도의 customHook
-const useComponent = () => {
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  return windowSize;
-};
-```
-
-- 사용 예
-
-```js
 function App() {
-  const { count, add, minus, reset } = useCount();
-  const { data, error, loading } = useAxios();
-  const { data, loading, error, isLogin, login } = useLogin();
-  const windowSize = useComponent();
   return (
     <div>
-      <h1>카운트: {count}</h1>
-      <button type="button" onClick={add}>
-        증가
-      </button>
-      <button type="button" onClick={minus}>
-        감소
-      </button>
-      <button type="button" onClick={reset}>
-        리셋
-      </button>
+      <h1>useReducer 활용</h1>
+      <Counter />
     </div>
   );
 }
+export default App;
 ```
+
+## 소규모 프로젝트
+
+- components/counter 폴더 생성
+- components/counter/Counter.jsx 파일 생성
+- components/counter/CounterReducer.js 파일 생성
+
+## 중규모 프로젝트
+
+- src/components/counter/Counter.jsx : UI
+- src/`store` 폴더 생성
+- src/store/`reducers` 폴더 생성
+- src/store/`initialStates` 폴더 생성
+
+## 대규모 프로젝트
+
+- `src/modules 폴더` 생성
+- `src/modules/counter 폴더` 생성
+
+  - countIntialState.js
+  - countTypes.js
+
+  ```js
+  // Action type의 상수화
+  export const ADD = "add";
+  export const MINUS = "minus";
+  export const RESET = "reset";
+  ```
+
+  - countReducer.js
+  - countActions.js
+
+  ```js
+  import { ADD, MINUS, RESET } from "./countTypes";
+
+  // action은 상태를 업데이트하는 과정
+  export const add = () => ({ type: ADD });
+  export const minus = () => ({ type: MINUS });
+  export const reset = () => ({ type: RESET });
+  ```
+
+  - Counter.jsx
+
+  ```jsx
+  <div>
+    <h1>Counter: {countState.count}</h1>
+    <button onClick={() => dispatch(add())}>증가</button>
+    <button onClick={() => dispatch(minus())}>감소</button>
+    <button onClick={() => dispatch(reset())}>초기화</button>
+  </div>
+  ```
