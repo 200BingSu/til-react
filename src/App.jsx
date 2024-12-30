@@ -5,8 +5,7 @@ import { useLogin } from "./hooks/useLogin";
 
 function App() {
   const { count, add, minus, reset } = useCount();
-  const { data, error, loading } = useAxios();
-  const { data, loading, error, isLogin, login } = useLogin();
+
   const windowSize = useComponent();
   return (
     <div>
@@ -20,6 +19,10 @@ function App() {
       <button type="button" onClick={reset}>
         리셋
       </button>
+      <img
+        src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDA4MThfMTYz%2FMDAxNzIzOTQ3MzI4MDg5.uMLSAgzfn51Ir9UWxDWL0CPVnRdb92Iy-Tj4Z7V4bVIg.Htb6kdStJzNAFKnA1lKcE_LvBznht3UiNXEtBAoh0QQg.PNG%2F001.png&type=a340"
+        alt=""
+      />
     </div>
   );
 }
