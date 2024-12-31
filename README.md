@@ -1,35 +1,36 @@
-# useReducer
+# useReducer 와 Context API 활용
 
-## 목적
+- useReducer 는 state 업데이트시 복잡한 과정을 처리하기 위해서 활용
+- useReducer 를 이용해서 Context 에 보관한 state 를 관리해 보자.
+- Context API 는 App 서비스 전체에 공용으로 사용하는 state 이다.
+- RTK 를 이해하기 위한 기초이다.
 
-- state를 생성
-- state를 업데이트하는 기능을 별도로 관리
-- state를 업데이트하는 과정이 복잡한 경우 적합함
-- Redux, Recoil, Zustand 등의 state 관리의 기본 구성을 이해하는데 도움.
+## counter 테스트 폴더 생성
 
-## useReducer 이해의 과정
+- `/src/contexts 폴더`
+  : `counterContext.js 파일` 생성
 
-- 간단한 state 관리
-- `폴더 컨벤션` 생성 후 관리(2단계 정도, 중소 규모 관리, 대규모 관리)
-- context API와 useReducer 활용
+```js
+import { createContext } from "react";
 
-## 기본 예제
+// Context 생성
+export const CounterStateContext = createContext(null);
+// Dispatch 용 Context 생성
+export const CounterDispatchContext = createContext(null);
+```
+
+: `counterProvider.jsx 파일` 생성(Vite 용)
 
 ```jsx
 import { useReducer } from "react";
+import { CounterDispatchContext, CounterStateContext } from "./counterContext";
 
-// 1. 초기 상태
+// 1. 기본값
 const initialState = { count: 0 };
-
-// 2. 리듀서 함수(상태를 변경하는 기능)
-// state는 초기 상태값을 말함. (별도로 업데이트하지 않는다)
-// action에 여러가지 옵션을 주어 state를 업데이트한다.
+// 2. 리듀서 함수
 function reducer(state, action) {
-  console.log("state:", state);
-  console.log("action:", action);
   switch (action.type) {
     case "add":
-      // 처리하고 나서 항상 state를 리턴해준다.
       return { count: state.count + 1 };
     case "minus":
       return { count: state.count - 1 };
@@ -40,82 +41,206 @@ function reducer(state, action) {
   }
 }
 
-function Counter() {
-  // 3. useReduce에 state와 디스패치 함수 등록
-  // 첫번째 매개변수: 리듀서 함수
-  // 두번째 매개변수: 초기값 state
-  // 리턴값: state는 리랜더링시 표현
-  // 리턴값: dispatch 는 리듀서 함수 실행
+// Context Provider 생성
+export function CounterProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
-    <div>
-      <p>결과값:{state.count}</p>
-      <button onClick={() => dispatch({ type: "add" })}>더하기</button>
-      <button onClick={() => dispatch({ type: "minus" })}>빼기</button>
-      <button onClick={() => dispatch({ type: "reset" })}>초기화</button>
-      <button onClick={() => dispatch({ type: "gogo" })}>테스트</button>
-    </div>
+    <CounterStateContext.Provider value={state}>
+      <CounterDispatchContext.Provider value={dispatch}>
+        {children}
+      </CounterDispatchContext.Provider>
+    </CounterStateContext.Provider>
   );
 }
+```
 
+- `/src/App.jsx`
+
+```jsx
+import Counter from "./components/counter/Counter";
+import { CounterProvider } from "./contexts/counterProvider";
+
+// 아래 Provide 에 의해서 state, disaptch 접근가능
 function App() {
   return (
-    <div>
-      <h1>useReducer 활용</h1>
+    <CounterProvider>
       <Counter />
-    </div>
+    </CounterProvider>
   );
 }
 export default App;
 ```
 
-## 소규모 프로젝트
+- `/src/components 폴더`
+  : Counter.jsx
 
-- components/counter 폴더 생성
-- components/counter/Counter.jsx 파일 생성
-- components/counter/CounterReducer.js 파일 생성
+```jsx
+import { useContext } from "react";
+import {
+  CounterDispatchContext,
+  CounterStateContext,
+} from "../../contexts/counterContext";
 
-## 중규모 프로젝트
+function Counter() {
+  // 앱 전체에 context state 용도
+  const state = useContext(CounterStateContext);
+  // 앱 전체 context dispatch 용도
+  const dispatch = useContext(CounterDispatchContext);
 
-- src/components/counter/Counter.jsx : UI
-- src/`store` 폴더 생성
-- src/store/`reducers` 폴더 생성
-- src/store/`initialStates` 폴더 생성
+  if (!state || !dispatch) {
+    return <div>Provider가 설정되지 않았습니다.</div>;
+  }
 
-## 대규모 프로젝트
+  return (
+    <div>
+      <h1>Counter : {state.count}</h1>
+      <button onClick={() => dispatch({ type: "add" })}>증가</button>
+      <button onClick={() => dispatch({ type: "minus" })}>감소</button>
+      <button onClick={() => dispatch({ type: "reset" })}>초기화</button>
+    </div>
+  );
+}
+export default Counter;
+```
 
-- `src/modules 폴더` 생성
-- `src/modules/counter 폴더` 생성
+## todo 테스트 폴더 생성
 
-  - countIntialState.js
-  - countTypes.js
+- `/src/contexts/ 폴더 ` 컨텍스트 생성
+  : `todoContext.js` (데이터 용)
 
-  ```js
-  // Action type의 상수화
-  export const ADD = "add";
-  export const MINUS = "minus";
-  export const RESET = "reset";
-  ```
+```js
+import { createContext } from "react";
 
-  - countReducer.js
-  - countActions.js
+// 데이터용 state context
+export const TodoStateContext = createContext(null);
+// 데이터 업데이트용 dispatch context
+export const TodoDispatchContext = createContext(null);
+```
 
-  ```js
-  import { ADD, MINUS, RESET } from "./countTypes";
+: `todoProvider.jsx` (context 에 데이터와 dispatch 등록)
 
-  // action은 상태를 업데이트하는 과정
-  export const add = () => ({ type: ADD });
-  export const minus = () => ({ type: MINUS });
-  export const reset = () => ({ type: RESET });
-  ```
+```jsx
+import { useReducer } from "react";
+import { TodoDispatchContext, TodoStateContext } from "./todoContext";
 
-  - Counter.jsx
+// 1. 상태생성
+const initialTodoState = [];
+// 2. 리듀서 함수
+function todoReducer(state, action) {
+  switch (action.type) {
+    case "add":
+      return [
+        ...state,
+        { id: Date.now(), text: action.payload, completed: false },
+      ];
+    case "toggle":
+      return state.map(item =>
+        item.id === action.payload
+          ? { ...item, completed: !item.completed }
+          : item,
+      );
+    case "delete":
+      // 배열.filter 조건이 true 것만 리턴
+      return state.filter(item => item.id !== action.payload);
+    default:
+      return state;
+  }
+}
+// 3. context provider 셋팅
+export function TodoProvider({ children }) {
+  const [todos, dispatch] = useReducer(todoReducer, initialTodoState);
+  return (
+    <TodoStateContext.Provider value={todos}>
+      <TodoDispatchContext.Provider value={dispatch}>
+        {children}
+      </TodoDispatchContext.Provider>
+    </TodoStateContext.Provider>
+  );
+}
+```
 
-  ```jsx
-  <div>
-    <h1>Counter: {countState.count}</h1>
-    <button onClick={() => dispatch(add())}>증가</button>
-    <button onClick={() => dispatch(minus())}>감소</button>
-    <button onClick={() => dispatch(reset())}>초기화</button>
-  </div>
-  ```
+### context 활용 컴포넌트들
+
+- `/src/components/todo 폴더` 생성
+  : `TodoAdd.jsx 파일` 생성
+
+```jsx
+import { useContext, useState } from "react";
+import { TodoDispatchContext } from "../../contexts/todoContext";
+
+// dispatch 를 이용해서 state 를 업데이트함.
+const TodoAdd = () => {
+  const dispatch = useContext(TodoDispatchContext);
+  const [text, setText] = useState("");
+  return (
+    <div>
+      <input type="text" value={text} onChange={e => setText(e.target.value)} />
+      <button
+        onClick={() => {
+          dispatch({ type: "add", payload: text });
+        }}
+      >
+        추가
+      </button>
+    </div>
+  );
+};
+export default TodoAdd;
+```
+
+: `TodoList.jsx 파일` 생성
+
+```jsx
+// constext state 에 변경된 내용 출력
+
+import { useContext } from "react";
+import { TodoStateContext } from "../../contexts/todoContext";
+import TodoItem from "./TodoItem";
+
+const TodoList = () => {
+  const todos = useContext(TodoStateContext);
+  return (
+    <div>
+      {todos.map(item => (
+        <div key={item.id}>
+          <TodoItem todo={item} />
+        </div>
+      ))}
+    </div>
+  );
+};
+export default TodoList;
+```
+
+: `TodoItem.jsx 파일` 생성
+
+```jsx
+import { useContext } from "react";
+import { TodoDispatchContext } from "../../contexts/todoContext";
+
+// dispath 로  delete, toggle
+const TodoItem = ({ todo }) => {
+  const dispatch = useContext(TodoDispatchContext);
+  return (
+    <div>
+      <span
+        style={{ textDecoration: todo.completed ? "line-through" : "none" }}
+        onClick={() => dispatch({ type: "toggle", payload: todo.id })}
+      >
+        {todo.id} : {todo.text}
+      </span>
+      <button onClick={() => dispatch({ type: "delete", payload: todo.id })}>
+        삭제
+      </button>
+    </div>
+  );
+};
+export default TodoItem;
+```
+
+# 고민해보세요.
+
+- 1. Context API를 사용할지 말지 고민
+     : 사용자 로그인 정보
+     : 디자인 스킨 정보
+     : 장바구니 정보
