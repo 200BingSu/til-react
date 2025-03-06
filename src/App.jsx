@@ -1,14 +1,20 @@
-import TodoAdd from "./components/todo/TodoAdd";
-import TodoList from "./components/todo/TodoList";
-import { TodoProvider } from "./contexts/todoProvider";
-
+import "./App.css";
 function App() {
   return (
-    // 아래 provider에 의해서 state와 dispatch에 접근가능
-    <TodoProvider>
-      <TodoAdd />
-      <TodoList />
-    </TodoProvider>
+    <div>
+      <h1>Grid</h1>
+      <div className="container">
+        <div className="item">A</div>
+        <div className="item">B</div>
+        <div className="item">C</div>
+        <div className="item">D</div>
+        <div className="item">E</div>
+        <div className="item">F</div>
+        <div className="item">G</div>
+        <div className="item">H</div>
+        <div className="item">I</div>
+      </div>
+    </div>
   );
 }
 export default App;
